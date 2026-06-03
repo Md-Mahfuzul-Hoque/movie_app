@@ -10,15 +10,18 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => MovieProvider(),
       child: MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
-        home: SplashScreen(),
+        title: 'Movie Review App',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF002335)),
+          useMaterial3: true,
+        ),
+        home: const SplashScreen(),
       ),
     );
   }

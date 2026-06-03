@@ -16,13 +16,10 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     Future.microtask(
-      () => Provider.of<MovieProvider>(
-        context,
-        listen: false,
-      ).fetchTrendingMovies(),
+          () => Provider.of<MovieProvider>(context, listen: false)
+          .fetchTrendingMovies(),
     );
   }
 
@@ -32,53 +29,94 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: AppColors.primary,
       appBar: AppBar(
         centerTitle: false,
-        title: Text(
-          'Home Screen',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
         backgroundColor: AppColors.primary,
+        elevation: 0,
+        title: const Text(
+          'Trending',
+          style: TextStyle(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
+          ),
+        ),
         actions: [
           IconButton(
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => SearchScreen()),
+                MaterialPageRoute(builder: (context) => const SearchScreen()),
               );
             },
-            icon: Icon(Icons.search, color: Colors.white),
+            icon: const Icon(Icons.search_rounded,
+                color: AppColors.textPrimary, size: 26),
           ),
+          const SizedBox(width: 4),
         ],
       ),
-      body: Column(
-        children: [
-          Consumer<MovieProvider>(
-            builder: (context, provider, child) {
-              if (provider.isLoading) {
-                return Center(child: CircularProgressIndicator());
-              }
-              return Expanded(
-                child: ListView.builder(
-                  itemCount: provider.trendingMovies.length,
-                  itemBuilder: (context, index) {
-                    return MovieCard(
-                      movie: provider.trendingMovies[index],
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => MovieDetails(
-                              movie: provider.trendingMovies[index],
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
+      body: Consumer<MovieProvider>(
+        builder: (context, provider, child) {
+          if (provider.isLoading) {
+            return const Center(
+              child: CircularProgressIndicator(color: AppColors.accent),
+            );
+          }
+
+          if (provider.errorMessage.isNotEmpty) {
+            return Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.error_outline,
+                      color: AppColors.textSecondary, size: 48),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Something went wrong.',
+                    style: const TextStyle(
+                        color: AppColors.textPrimary, fontSize: 16),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.accent,
+                      foregroundColor: Colors.black,
+                    ),
+                    onPressed: () => provider.fetchTrendingMovies(),
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          if (provider.trendingMovies.isEmpty) {
+            return const Center(
+              child: Text(
+                'No movies found.',
+                style: TextStyle(color: AppColors.textSecondary),
+              ),
+            );
+          }
+
+          return ListView.builder(
+            padding: const EdgeInsets.only(top: 8, bottom: 24),
+            itemCount: provider.trendingMovies.length,
+            itemBuilder: (context, index) {
+              return MovieCard(
+                movie: provider.trendingMovies[index],
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MovieDetails(
+                        movie: provider.trendingMovies[index],
+                      ),
+                    ),
+                  );
+                },
               );
             },
-          ),
-        ],
+          );
+        },
       ),
     );
   }

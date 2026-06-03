@@ -11,8 +11,17 @@ class MovieProvider extends ChangeNotifier {
   List<Movie> _searchResults = [];
   List<Movie> get searchResults => _searchResults;
 
+  Map<String, dynamic> _movieDetails = {};
+  Map<String, dynamic> get movieDetails => _movieDetails;
+
+  List<Map<String, dynamic>> _movieReviews = [];
+  List<Map<String, dynamic>> get movieReviews => _movieReviews;
+
   bool _isLoading = false;
   bool get isLoading => _isLoading;
+
+  bool _isReviewsLoading = false;
+  bool get isReviewsLoading => _isReviewsLoading;
 
   String _errorMessage = '';
   String get errorMessage => _errorMessage;
@@ -53,17 +62,34 @@ class MovieProvider extends ChangeNotifier {
     }
   }
 
-  Future<Map<String, dynamic>> fetchMovieDetails(int movieId) async {
+  Future<void> fetchMovieDetails(int movieId) async {
     _isLoading = true;
+    _movieDetails = {};
     notifyListeners();
 
     try {
-      return await _apiService.getMovieDetails(movieId);
+      _movieDetails = await _apiService.getMovieDetails(movieId);
+      _errorMessage = '';
     } catch (e) {
       _errorMessage = e.toString();
-      throw Exception('Failed to load movie details: $e');
     } finally {
       _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> fetchMovieReviews(int movieId) async {
+    _isReviewsLoading = true;
+    _movieReviews = [];
+    notifyListeners();
+
+    try {
+      _movieReviews = await _apiService.getMovieReviews(movieId);
+      _errorMessage = '';
+    } catch (e) {
+      _errorMessage = e.toString();
+    } finally {
+      _isReviewsLoading = false;
       notifyListeners();
     }
   }
