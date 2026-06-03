@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:movie_review_app/core/app_colors.dart';
 import 'package:movie_review_app/core/app_strings.dart';
-import 'package:movie_review_app/presentation/screens/home_screen.dart';
+import 'package:movie_review_app/presentation/screens/main_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -31,7 +31,7 @@ class _SplashScreenState extends State<SplashScreen>
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
+        MaterialPageRoute(builder: (_) => const MainScreen()),
       );
     });
   }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:movie_review_app/presentation/provider/movie_provider.dart';
+import 'package:movie_review_app/presentation/provider/user_review_provider.dart';
+import 'package:movie_review_app/presentation/provider/watchlist_provider.dart';
 import 'package:movie_review_app/presentation/screens/splash_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -12,8 +14,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => MovieProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => MovieProvider()),
+        ChangeNotifierProvider(create: (_) => WatchlistProvider()),
+        ChangeNotifierProvider(create: (_) => UserReviewProvider()),
+      ],
       child: MaterialApp(
         title: 'Movie Review App',
         debugShowCheckedModeBanner: false,

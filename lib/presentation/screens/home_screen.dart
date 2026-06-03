@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:movie_review_app/core/app_colors.dart';
 import 'package:movie_review_app/presentation/provider/movie_provider.dart';
 import 'package:movie_review_app/presentation/screens/movie_card.dart';
+import 'package:movie_review_app/presentation/screens/movie_card_shimmer.dart';
 import 'package:movie_review_app/presentation/screens/movie_details.dart';
-import 'package:movie_review_app/presentation/screens/search_screen.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -31,6 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
         centerTitle: false,
         backgroundColor: AppColors.primary,
         elevation: 0,
+        automaticallyImplyLeading: false,
         title: const Text(
           'Trending',
           style: TextStyle(
@@ -39,55 +40,61 @@ class _HomeScreenState extends State<HomeScreen> {
             fontSize: 22,
           ),
         ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SearchScreen()),
-              );
-            },
-            icon: const Icon(Icons.search_rounded,
-                color: AppColors.textPrimary, size: 26),
-          ),
-          const SizedBox(width: 4),
-        ],
       ),
       body: Consumer<MovieProvider>(
         builder: (context, provider, child) {
+          // Shimmer loading
           if (provider.isLoading) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppColors.accent),
+            return ListView.builder(
+              padding: const EdgeInsets.only(top: 8, bottom: 24),
+              itemCount: 6,
+              itemBuilder: (_, __) => const MovieCardShimmer(),
             );
           }
 
+          // Error state
           if (provider.errorMessage.isNotEmpty) {
             return Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.error_outline,
-                      color: AppColors.textSecondary, size: 48),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Something went wrong.',
-                    style: const TextStyle(
-                        color: AppColors.textPrimary, fontSize: 16),
-                  ),
+                  const Icon(Icons.wifi_off_rounded,
+                      color: AppColors.textSecondary, size: 52),
                   const SizedBox(height: 16),
-                  ElevatedButton(
+                  const Text(
+                    'Could not load movies',
+                    style: TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Check your internet connection',
+                    style: TextStyle(
+                        color: AppColors.textSecondary, fontSize: 13),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.accent,
                       foregroundColor: Colors.black,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
                     ),
                     onPressed: () => provider.fetchTrendingMovies(),
-                    child: const Text('Retry'),
+                    icon: const Icon(Icons.refresh_rounded, size: 18),
+                    label: const Text('Retry',
+                        style: TextStyle(fontWeight: FontWeight.w600)),
                   ),
                 ],
               ),
             );
           }
 
+          // Empty state
           if (provider.trendingMovies.isEmpty) {
             return const Center(
               child: Text(
